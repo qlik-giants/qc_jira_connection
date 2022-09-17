@@ -1,0 +1,94 @@
+
+/*********************************************************************
+Application: fGetJiraData.qvs
+Version: 1.0
+Author: jmbenedetto
+Date created: 2022-09-16
+Date last modified:
+Description: This script conneects to pJiraConnection and creates
+            too tables in QC: Epic and Issue. %Epic.id connects both tables.
+***********************************************************************/
+
+/**************************[ Local Subs ]******************************/
+//fReplacePartOfFieldName function is also available as a standalone qvs file.
+
+SUB fReplacePartOfFieldName(pTable,pFromStr,pToStr);
+  SET vList=;
+  SET vDelimiter=CHR(13);
+
+  FOR i=1 TO NoOfFields('$(pTable)');
+      LET vFieldName = FieldName($(i),'$(pTable)');
+      let vList = '$(vList)' & $(vDelimiter) & '$(vFieldName)';
+  NEXT i;
+
+  mapString:
+  MAPPING LOAD * INLINE [
+      FromStr,ToStr
+      $(pFromStr),$(pToStr)
+  ];
+
+  mapColumn:
+  MAPPING LOAD
+      ColumnName,
+      MapSubString('mapString', ColumnName) as NewColumnName;
+  LOAD * INLINE [
+     ColumnName
+     $(vList)
+  ];
+
+  Rename Fields using mapColumn;
+END SUB;
+
+/**************************[ Main Function ]******************************/
+
+SUB fGetJiraIssues(pJiraConnection, pJiraProject)
+
+LIB CONNECT TO '$(pJiraConnection)';
+
+ALIAS id as fields_id, key as fields_key;
+
+Qualify *;
+
+[Epic]:
+SELECT *
+FROM Issues
+WITH PROPERTIES (
+projectIdOrKey='$(pJiraProject)',
+createdAfter='',
+createdBefore='',
+updatedAfter='',
+updatedBefore='',
+customFieldIds='',
+jqlQuery='issuetype = Epic',
+maxResults=''
+);
+
+CALL fReplacePartOfFieldName('Epic','Epic.fields_','Epic.')
+
+Unqualify *;
+
+FOR i=0 to NoOfRows('Epic')-1;
+	Let vEpic=Peek('Epic.id',$(i),'Epic');
+    TRACE $(vEpic);
+	[Issue]:
+    LOAD *,
+      $(vEpic) as Epic.id;
+    SELECT *
+      FROM Issues
+      WITH PROPERTIES (
+      projectIdOrKey='$(pJiraProject)',
+      createdAfter='',
+      createdBefore='',
+      updatedAfter='',
+      updatedBefore='',
+      customFieldIds='',
+      jqlQuery='"epic link" = $(vEpic)',
+      maxResults=''
+    );
+NEXT i;
+
+CALL fReplacePartOfFieldName('Issue','fields_','')
+
+RENAME FIELDS Epic.id TO %Epic.id, id TO %Issue.id;
+
+END SUB;

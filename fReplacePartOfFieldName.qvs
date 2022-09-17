@@ -1,0 +1,36 @@
+/*********************************************************************
+Application: fReplacePartOfTableFieldNames.qvs
+Version: 1.0
+Author: jmbenedetto
+Date created: 2022-09-16
+Date last modified:
+Description: This script replaces pFromStr by pToStr in every occurence
+             for all pTable field names.
+***********************************************************************/
+
+SUB fReplacePartOfFieldName(pTable,pFromStr,pToStr);
+  SET vList=;
+  SET vDelimiter=CHR(13);
+
+  FOR i=1 TO NoOfFields('$(pTable)');
+      LET vFieldName = FieldName($(i),'$(pTable)');
+      let vList = '$(vList)' & $(vDelimiter) & '$(vFieldName)';
+  NEXT i;
+
+  mapString:
+  MAPPING LOAD * INLINE [
+      FromStr,ToStr
+      $(pFromStr),$(pToStr)
+  ];
+
+  mapColumn:
+  MAPPING LOAD
+      ColumnName,
+      MapSubString('mapString', ColumnName) as NewColumnName;
+  LOAD * INLINE [
+     ColumnName
+     $(vList)
+  ];
+
+  Rename Fields using mapColumn;
+END SUB;
