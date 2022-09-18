@@ -45,8 +45,6 @@ SUB fGetJiraIssues(pJiraConnection, pJiraProject)
 
 LIB CONNECT TO '$(pJiraConnection)';
 
-ALIAS id as fields_id, key as fields_key;
-
 Qualify *;
 
 [Epic]:
