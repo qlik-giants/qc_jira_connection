@@ -1,0 +1,63 @@
+SUB fGetJiraCustomFieldsValues(pIssueTable,pIssueIDField,pKeepHistoryTable);
+
+set ErrorMode=0;
+
+//FOR i=0 to 3
+FOR i=0 to NoOfRows('$(pIssueTable)')-1
+	vIssue=Peek('$(pIssueIDField)',$(i),'$(pIssueTable)');
+
+[History]:
+LOAD
+	*,
+	$(vIssue) as [$(pIssueIDField)];
+
+SELECT *
+FROM History
+WITH PROPERTIES (
+issueIdOrKey='$(vIssue)'
+);
+
+NEXT i;
+
+SET ErrorMode=1;
+
+For fieldIdx = 1 to NoOfFields('History')
+	LET vFieldName = FieldName($(fieldIdx), 'History');
+    TRACE Before $(vFieldName);
+	RENAME Field [$(vFieldName)] TO [History.$(vFieldName)];
+	LET vNewFieldName = FieldName($(fieldIdx), 'History');    
+    TRACE After $(vNewFieldName);
+Next fieldIdx
+
+RENAME FIELD History.id to %History.id, [History.$(pIssueIDField)] to [$(pIssueIDField)];
+
+[tmpCustomFields]:
+LOAD
+	[$(pIssueIDField)],
+    History.field,
+	Max(%History.id) as %History.id
+RESIDENT [History]
+WHERE History.fieldtype = 'custom'
+GROUP BY [$(pIssueIDField)],History.field
+;
+
+INNER JOIN (tmpCustomFields)
+LOAD *
+RESIDENT [History]
+WHERE History.fieldtype = 'custom'
+;
+
+GENERIC LOAD
+	[$(pIssueIDField)],
+    History.field,
+    History.toString
+RESIDENT tmpCustomFields
+;
+
+DROP TABLE tmpCustomFields;
+
+IF $(pKeepHistoryTable) <> 'Yes' THEN
+	DROP TABLE History;
+END IF
+
+END SUB;
