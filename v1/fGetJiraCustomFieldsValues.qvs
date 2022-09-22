@@ -16,6 +16,9 @@ Parameters:
 
 SUB fGetJiraCustomFieldsValues(pJiraConnection,pIssueTable,pIssueIDField);
 
+//avoid created field to me renamed as History.created latter on the script.
+RENAME FIELD created to Issue.created;
+
 LIB CONNECT TO '$(pJiraConnection)';
 
 set ErrorMode=0;
@@ -28,7 +31,6 @@ FOR i=0 to NoOfRows('$(pIssueTable)')-1
 LOAD
 	*,
 	$(vIssue) as [$(pIssueIDField)];
-
 SELECT *
 FROM History
 WITH PROPERTIES (
@@ -73,6 +75,9 @@ RESIDENT tmpCustomFields
 ;
 
 DROP TABLE tmpCustomFields;
+
+//avoid created field to me renamed as History.created latter on the script.
+RENAME FIELD Issue.created to created;
 
 /******************************************************************/
 TRACE Table History created;

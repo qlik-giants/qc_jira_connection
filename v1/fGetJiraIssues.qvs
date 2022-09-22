@@ -1,10 +1,8 @@
-
 /*********************************************************************
-Application: fGetJiraData.qvs
+Application: fGetJiraIssues.qvs
 Version: 1.0
 Author: jmbenedetto
 Date created: 2022-09-16
-Date last modified:
 Description: This script conneects to pJiraConnection and creates
             too tables in QC: Epic and Issue. %Epic.id connects both tables.
 ***********************************************************************/
