@@ -1,19 +1,18 @@
-// /*********************************************************************
-// Application: fGetJiraCustomFieldsValues.qvs
-// Version: 1.0
-// Author: jmbenedetto
-// Date created: 2022-09-16
-// Date last modified:
-// Description: This script connects to pJiraConnection and gets History data
+/*********************************************************************
+Application: fGetJiraCustomFieldsValues.qvs
+Version: 1.0
+Author: jmbenedetto
+Date created: 2022-09-21
+Description: This script connects to pJiraConnection and gets History data
 		for each pIssueIDField in pIssueTable. Then it creates as many
 		tables as there are custom fields in History, each with 2
 		columns, pIssueIDField and custom_field_name.
-// Parameters:
+Parameters:
 	pJiraConnection: Qlik Cloud data connection (SpaceName:ConnectionName).
 	pIssueTable: Table with the issues to get custom fields data about.
 	pIssueIDField: Field containing the issue ID to be used as parameter
 		during Jira connector history call.
-// ***********************************************************************/
+***********************************************************************/
 
 SUB fGetJiraCustomFieldsValues(pJiraConnection,pIssueTable,pIssueIDField);
 
@@ -75,8 +74,8 @@ RESIDENT tmpCustomFields
 
 DROP TABLE tmpCustomFields;
 
-******************************************************************
+/******************************************************************/
 TRACE Table History created.
 TRACE 1 table created for each custom field
-******************************************************************
+/******************************************************************/
 END SUB;
