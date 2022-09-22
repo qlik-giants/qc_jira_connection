@@ -75,7 +75,7 @@ RESIDENT tmpCustomFields
 DROP TABLE tmpCustomFields;
 
 /******************************************************************/
-TRACE Table History created.
-TRACE 1 table created for each custom field
+TRACE Table History created;
+TRACE 1 table created for each custom field;
 /******************************************************************/
 END SUB;
