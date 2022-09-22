@@ -1,5 +1,6 @@
-# The problem
-Qlik Cloud connector to Jira does not expose the relationship between epics and user story or task.
+# The problems
+Qlik Cloud connector to Jira:
+- does not expose the relationship between epics and user story or task.
 
 # The goal
 To create two different tables in QS, one for epics and the other for stories and taks. Epics will be a FK at the US table.
